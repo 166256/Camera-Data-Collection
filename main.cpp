@@ -11,6 +11,7 @@ using namespace cv;
 // 创建视频采集对象;
 VideoCapture cap;	
 Mat frame;	// 摄像头读取到的帧
+unsigned char stop_flag = 0;
 
 void hello()
 {
@@ -21,7 +22,7 @@ void hello()
 
 void cap_accept()
 {
-	namedWindow("Video", 1);	// 显示窗口命名;
+	// namedWindow("Video", 1);	// 显示窗口命名;
 
 	while (1)
 	{
@@ -32,10 +33,10 @@ void cap_accept()
 			return;
 
 		// 显示新的帧;
-		imshow("Video", frame);
+		// imshow("Video", frame);
 		
 		// 按键退出显示;
-		if (waitKey(30) >= 0) 
+		if (stop_flag == 1) 
 			break;
 	}
 }
@@ -50,7 +51,11 @@ void cap_process()
 		
 		// // 按键退出显示;
 		if (waitKey(30) >= 0) 
+		{
+			stop_flag = 1;
 			break;
+		}
+			
 	}
 }
 
@@ -62,12 +67,13 @@ int main(int argc, const char** argv)
 	if (!cap.isOpened())
 		return -1;
 
-	thread a(hello),b(cap_accept);
-	// thread c(cap_process);
+	// thread a(hello);
+	thread b(cap_accept);
+	thread c(cap_process);
 
-	a.join();
+	// a.join();
 	b.join();
-	// c.join();
+	c.join();
 
 	cap.release();	// 释放视频采集对象;
 	return 0;
